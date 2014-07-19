@@ -29,6 +29,13 @@ class Graph{
     int[][] nextNode;
     // Number of vertices in the graph
     int V;
+    // default constructor initializes the graph to 0s
+    Graph(int V){
+        adjMatrix = new int[V][V];
+        allPairs = new int[V][V];
+        nextNode = new int[V][V];
+        this.V = V;    
+    }
     /*
     The Graph constructor initiates the adjacency matrix with dimensions VxV
     and initialize all edges to infinity or in this case to Integer.MAX_VALUE
