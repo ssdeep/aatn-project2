@@ -11,13 +11,13 @@ package aatnproject2;
  *
  * @author esamsai
  */
-public class Main {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
+class Edge{
+    int x;
+    int y;
+    int weight;
+    Edge(int x, int y, int w){
+        this.x = x;
+        this.y = y;
+        this.weight = w;
     }
-    
 }
