@@ -25,12 +25,12 @@ public class Main {
     public static void main(String[] args) {
         // TODO code application logic here
         // number of vertices
-        int n = 4;
+        int n = 5;
         // the data structures for graphing purposes
         ArrayList<Double> densities = new ArrayList<>();
         ArrayList<Integer> LambdaG = new ArrayList<>();
         // do the experiment for m values 60..600
-        for(int m = 8 ; m <= 8 ; m++){
+        for(int m = 20 ; m <= 20 ; m++){
             Graph network = new Graph(n);
             int edges = m;
             // allNodes is a HashMap containing all the nodes present in a network along with their degrees
