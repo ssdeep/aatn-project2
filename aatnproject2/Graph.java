@@ -7,7 +7,10 @@
 
 package aatnproject2;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  *
@@ -91,6 +94,17 @@ class Graph{
                         nextNode[i][j] = nextNode[i][k];
                     }
                 }
+            }
+        }
+    }
+
+    void forceInputs() throws FileNotFoundException {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Scanner sc = new Scanner(new File("forcedInput.txt"));
+        for(int i = 0 ; i < this.V ; i++){
+            String[] inputs = sc.nextLine().split("\\t");
+            for(int j = 0 ; j < this.V ; j++){
+                this.adjMatrix[i][j] = Integer.parseInt(inputs[j]);
             }
         }
     }

@@ -7,6 +7,7 @@
 
 package aatnproject2;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -22,16 +23,18 @@ public class Main {
      */
     // a random number generator
       private static  Random rand = new Random();
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         // TODO code application logic here
         // number of vertices
-        int n = 5;
+        int n = 12;
         // the data structures for graphing purposes
         ArrayList<Double> densities = new ArrayList<>();
         ArrayList<Integer> LambdaG = new ArrayList<>();
+        ArrayList<Integer> lowestDegrees = new ArrayList<>();
         // do the experiment for m values 60..600
-        for(int m = 20 ; m <= 20 ; m++){
+        for(int m = 60 ; m <= 60 ; m = m+60){
             Graph network = new Graph(n);
+            int[] degVector = new int[n];
             int edges = m;
             // allNodes is a HashMap containing all the nodes present in a network along with their degrees
             ArrayList<Integer> allNodes = new ArrayList<>();
@@ -47,20 +50,34 @@ public class Main {
                     //allNodes.put(j, allNodes.get(j) + 1);
                     network.adjMatrix[i][j]++;
                     network.adjMatrix[j][i]++;
+                    degVector[i]++;
+                    degVector[j]++;
                 }
             }
-            
-            printMatrix(network.adjMatrix, n);
-            System.out.println(allNodes);
+            network.forceInputs();
+            recomputeDegreeVector(degVector, network.adjMatrix);
+            //printMatrix(network.adjMatrix, n);
+           // System.out.println(allNodes);
             //printHashMap(allNodes);
             // Create MA ordering
             
-            ArrayList<Integer> MA = new ArrayList<>();
-            createMAOrder(MA, network.adjMatrix, allNodes);
-            System.out.println("MA Ordering"+MA);
+            //ArrayList<Integer> MA = new ArrayList<>();
+            //createMAOrder(MA, network.adjMatrix, allNodes);
+            int LG = Lambda(network.adjMatrix, allNodes, n);
+            LambdaG.add(LG);
+            densities.add(2*m/(double)n);
+            // minimum degree
+            int minDeg = degVector[0];
+            for(int k = 0 ; k < degVector.length ; k++)
+                if(minDeg>degVector[k])
+                    minDeg = degVector[k];
+            lowestDegrees.add(minDeg);
+           // System.out.println("MA Ordering"+MA);
             
         }
-        
+        System.out.println("Lambda Values:"+LambdaG);
+        System.out.println("Densities:"+densities);
+        System.out.println("Lowest Degrees:"+lowestDegrees);
     }
 
     // a debugging utility for printing out matrices
@@ -109,6 +126,69 @@ public class Main {
             MA.add(maxind);
         }
         
+    }
+
+    private static int Lambda(int[][] adjMatrix, ArrayList<Integer> allNodes, int n) {
+        
+        if(allNodes.size() == 2){
+            return adjMatrix[allNodes.get(0)][allNodes.get(1)];
+        }
+        
+        ArrayList<Integer> MA = new ArrayList<>();
+        createMAOrder(MA, adjMatrix, allNodes);// get MA Ordering
+        //System.out.println("MA Ordering:"+MA);
+        int x = MA.get(MA.size() - 2);
+        int y = MA.get(MA.size() - 1);
+        int LambdaXY = degreeOf(y, adjMatrix, n);
+        merge(x, y, adjMatrix, n);
+       // System.out.println("After Merging "+x+" and "+y);
+       // printMatrix(adjMatrix, n);
+        // remove y
+        for(int i = 0 ; i < allNodes.size() ; i++){
+            if(allNodes.get(i) == y){
+                allNodes.remove(i);
+                break;
+            }
+        }
+        
+        return Math.min(LambdaXY, Lambda(adjMatrix, allNodes, n));
+    
+    }
+
+    private static int degreeOf(Integer x, int[][] adjMatrix, int n) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        int degree = 0;
+        for(int i = 0 ; i < n ; i++){
+            degree+=adjMatrix[x][i];
+        }
+        
+        return degree;
+    }
+
+    private static void merge(int x, int y, int[][] adjMatrix, int n) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        adjMatrix[x][y] = 0;
+        adjMatrix[y][x] = 0;
+        for(int i = 0 ; i < n ; i++){
+            if(i!=x){
+                adjMatrix[x][i]+=adjMatrix[y][i];
+                adjMatrix[i][x] = adjMatrix[x][i];
+                adjMatrix[y][i] = 0;
+                adjMatrix[i][y] = 0;
+            }
+        }
+        
+    }
+
+    private static void recomputeDegreeVector(int[] degVector, int[][] adjMatrix) {
+        for(int i = 0 ; i < degVector.length ; i++){
+            degVector[i] = 0 ;
+            for(int j = 0 ; j < degVector.length; j++)
+            {
+                degVector[i]+= adjMatrix[i][j];
+            }
+        }
+    
     }
     
 }
