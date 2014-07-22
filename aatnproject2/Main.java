@@ -32,7 +32,7 @@ public class Main {
         ArrayList<Integer> LambdaG = new ArrayList<>();
         ArrayList<Integer> lowestDegrees = new ArrayList<>();
         // do the experiment for m values 60..600
-        for(int m = 60 ; m <= 60 ; m = m+60){
+        for(int m = 60 ; m <= 600 ; m = m+10){
             Graph network = new Graph(n);
             int[] degVector = new int[n];
             int edges = m;
@@ -54,12 +54,18 @@ public class Main {
                     degVector[j]++;
                 }
             }
-            network.forceInputs();
-            recomputeDegreeVector(degVector, network.adjMatrix);
+            // to debug the program with forced input, uncomment the following line
+           // network.forceInputs();
+            // to recompute the degree vector based on new inputs uncomment the following line
+           // recomputeDegreeVector(degVector, network.adjMatrix);
+            
+            
             //printMatrix(network.adjMatrix, n);
            // System.out.println(allNodes);
             //printHashMap(allNodes);
-            // Create MA ordering
+            
+
+// Create MA ordering
             
             //ArrayList<Integer> MA = new ArrayList<>();
             //createMAOrder(MA, network.adjMatrix, allNodes);
