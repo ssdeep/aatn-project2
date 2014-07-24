@@ -84,6 +84,7 @@ public class Main {
             {
                 //System.out.println("no overflow");
                 LambdaG.add(0);
+                criticalEdges.add(0);
                 continue;
            }
 
@@ -95,7 +96,7 @@ public class Main {
             int LG = Lambda(network.adjMatrix, allNodes, n);
             LambdaG.add(LG);
             criticalEdges.add(criticalEdgeCount);
-            
+           // printMatrix(network.adjMatrix, n);
            // System.out.println("MA Ordering"+MA);
             
         }
@@ -165,6 +166,7 @@ public class Main {
         int x = MA.get(MA.size() - 2);
         int y = MA.get(MA.size() - 1);
         int LambdaXY = degreeOf(y, adjMatrix, n);
+        int edgeCriticality = adjMatrix[x][y];
         merge(x, y, adjMatrix, n);
        // System.out.println("After Merging "+x+" and "+y);
        // printMatrix(adjMatrix, n);
@@ -178,7 +180,7 @@ public class Main {
          
         int LambdaGxy = Lambda(adjMatrix, allNodes, n);
         if(LambdaXY<LambdaGxy){
-            criticalEdgeCount++;
+            criticalEdgeCount += edgeCriticality;
             return LambdaXY;
         }
         else{
