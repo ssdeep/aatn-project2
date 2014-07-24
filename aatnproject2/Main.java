@@ -7,10 +7,14 @@
 
 package aatnproject2;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Scanner;
 
 /**
  *
@@ -23,14 +27,16 @@ public class Main {
      */
     // a random number generator
       private static  Random rand = new Random();
-    public static void main(String[] args) throws FileNotFoundException {
+      private static int criticalEdgeCount = 0;
+    public static void main(String[] args) throws FileNotFoundException, IOException {
         // TODO code application logic here
         // number of vertices
-        int n = 12;
+        int n = 30;
         // the data structures for graphing purposes
         ArrayList<Double> densities = new ArrayList<>();
         ArrayList<Integer> LambdaG = new ArrayList<>();
         ArrayList<Integer> lowestDegrees = new ArrayList<>();
+        ArrayList<Integer> criticalEdges = new ArrayList<>();
         // do the experiment for m values 60..600
         for(int m = 60 ; m <= 600 ; m = m+10){
             Graph network = new Graph(n);
@@ -60,37 +66,50 @@ public class Main {
            // recomputeDegreeVector(degVector, network.adjMatrix);
             
             
-            //printMatrix(network.adjMatrix, n);
+           // printMatrix(network.adjMatrix, n);
            // System.out.println(allNodes);
             //printHashMap(allNodes);
-            
-
-// Create MA ordering
-            
-            //ArrayList<Integer> MA = new ArrayList<>();
-            //createMAOrder(MA, network.adjMatrix, allNodes);
-            int LG = Lambda(network.adjMatrix, allNodes, n);
-            LambdaG.add(LG);
-            densities.add(2*m/(double)n);
             // minimum degree
             int minDeg = degVector[0];
             for(int k = 0 ; k < degVector.length ; k++)
                 if(minDeg>degVector[k])
                     minDeg = degVector[k];
             lowestDegrees.add(minDeg);
+            // densities
+            densities.add(2*m/(double)n);
+            // Check if the graph is connected
+            // the graph
+            //printMatrix(network.adjMatrix, n);
+            if(!network.isConnected())
+            {
+                //System.out.println("no overflow");
+                LambdaG.add(0);
+                continue;
+           }
+
+// Create MA ordering
+            
+            //ArrayList<Integer> MA = new ArrayList<>();
+            //createMAOrder(MA, network.adjMatrix, allNodes);
+            criticalEdgeCount = 0;
+            int LG = Lambda(network.adjMatrix, allNodes, n);
+            LambdaG.add(LG);
+            criticalEdges.add(criticalEdgeCount);
+            
            // System.out.println("MA Ordering"+MA);
             
         }
         System.out.println("Lambda Values:"+LambdaG);
         System.out.println("Densities:"+densities);
         System.out.println("Lowest Degrees:"+lowestDegrees);
+        printToFile(LambdaG, densities, lowestDegrees, criticalEdges);
     }
 
     // a debugging utility for printing out matrices
     private static void printMatrix(int[][] adjMatrix, int V) {
         for(int i = 0 ; i < V ; i++){
             for(int j = 0 ; j < V; j++){
-                System.out.print(adjMatrix[i][j]+"\t");
+                System.out.print(adjMatrix[i][j]+"");
             }
             System.out.println("");
         }
@@ -156,8 +175,17 @@ public class Main {
                 break;
             }
         }
+         
+        int LambdaGxy = Lambda(adjMatrix, allNodes, n);
+        if(LambdaXY<LambdaGxy){
+            criticalEdgeCount++;
+            return LambdaXY;
+        }
+        else{
+            return LambdaGxy;
+        }
         
-        return Math.min(LambdaXY, Lambda(adjMatrix, allNodes, n));
+       // return Math.min(LambdaXY, Lambda(adjMatrix, allNodes, n));
     
     }
 
@@ -195,6 +223,17 @@ public class Main {
             }
         }
     
+    }
+
+    private static void printToFile(ArrayList<Integer> LambdaG, ArrayList<Double> densities, ArrayList<Integer> lowestDegrees, ArrayList<Integer> criticalEdges) throws FileNotFoundException, IOException {
+       FileWriter fw = new FileWriter("output.csv");
+       fw.write("LambdaG,densities,lowestDegree,criticalEdges\n");
+               
+        
+        for(int i = 0 ; i < LambdaG.size() ; i++){
+            fw.write(LambdaG.get(i)+","+densities.get(i)+","+lowestDegrees.get(i)+","+criticalEdges.get(i)+"\n");
+        }
+        fw.close();
     }
     
 }

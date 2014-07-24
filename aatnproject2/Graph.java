@@ -32,11 +32,15 @@ class Graph{
     int[][] nextNode;
     // Number of vertices in the graph
     int V;
+    // For graph connectivity
+    int numConnectComp = 0; // number of connected components initialized to 0
+    
     // default constructor initializes the graph to 0s
     Graph(int V){
         adjMatrix = new int[V][V];
         allPairs = new int[V][V];
         nextNode = new int[V][V];
+       //toVisit = new boolean[V];
         this.V = V;    
     }
     /*
@@ -49,6 +53,7 @@ class Graph{
         adjMatrix = new int[V][V];
         allPairs = new int[V][V];
         nextNode = new int[V][V];
+       // toVisit = new boolean[V];
             this.V = V;    
             // Initialize all the matrices
                 for(int i = 0 ; i < V ; i++){
@@ -107,6 +112,45 @@ class Graph{
                 this.adjMatrix[i][j] = Integer.parseInt(inputs[j]);
             }
         }
+    }
+
+    boolean isConnected() {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        this.numConnectComp=1;
+        // Next To visit
+        boolean[] toVisit = new boolean[this.V];
+        int numVertices = this.V;
+        ArrayList<Integer> next = new ArrayList<Integer>();
+        next.add(0);
+        //ArrayList<Integer> after = new ArrayList<Integer>();
+        while(next.size()!=0){
+            int i = next.get(0);
+            toVisit[i] = true;
+            numVertices--;
+            next.remove(0);
+            for(int k = 0 ; k < V ; k++){
+                if(this.adjMatrix[i][k] > 0 && !toVisit[k] && !next.contains(k)){
+                    next.add(k);
+                }
+            }
+            
+        }
+        
+        if(numVertices == 0){
+            return true;
+        }
+        else
+        {
+            System.out.println("Not connected are");
+            for(int i = 0 ; i < this.V ; i++){
+                if(!toVisit[i]){
+                    System.out.println(i);
+                }
+            }
+            return false;
+        }
+    
     }
     
 }
