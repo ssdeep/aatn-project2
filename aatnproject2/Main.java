@@ -32,17 +32,25 @@ public class Main {
         // TODO code application logic here
         // number of vertices
         int n = 30;
+        // number of edges to be added
+        int edges = 0 ;
         // the data structures for graphing purposes
         ArrayList<Double> densities = new ArrayList<>();
         ArrayList<Integer> LambdaG = new ArrayList<>();
         ArrayList<Integer> lowestDegrees = new ArrayList<>();
         ArrayList<Integer> criticalEdges = new ArrayList<>();
+        // initiate the graph
+        Graph network = new Graph(n);
         // do the experiment for m values 60..600
-        for(int m = 60 ; m <= 600 ; m = m+10){
-            Graph network = new Graph(n);
+        for(int m = 60 ; m <= 600 ; m = m+5){
+            
             int[] degVector = new int[n];
-            int edges = m;
-            // allNodes is a HashMap containing all the nodes present in a network along with their degrees
+           
+            if(m==60)
+            edges = m - edges;
+            else
+            edges = 5;
+            // allNodes is an ArrayList containing all the nodes present in a network along with their degrees
             ArrayList<Integer> allNodes = new ArrayList<>();
             for(int i = 0 ; i < n ; i++)
                 allNodes.add(i);
@@ -63,10 +71,11 @@ public class Main {
             // to debug the program with forced input, uncomment the following line
            // network.forceInputs();
             // to recompute the degree vector based on new inputs uncomment the following line
-           // recomputeDegreeVector(degVector, network.adjMatrix);
+            recomputeDegreeVector(degVector, network.adjMatrix);
             
             
            // printMatrix(network.adjMatrix, n);
+           // System.out.println("");
            // System.out.println(allNodes);
             //printHashMap(allNodes);
             // minimum degree
@@ -74,12 +83,13 @@ public class Main {
             for(int k = 0 ; k < degVector.length ; k++)
                 if(minDeg>degVector[k])
                     minDeg = degVector[k];
+            // Lowest degree of the graph and the density of the graph can be computed regardless of the LambaValue
+            // lowest degree
             lowestDegrees.add(minDeg);
             // densities
             densities.add(2*m/(double)n);
             // Check if the graph is connected
-            // the graph
-            //printMatrix(network.adjMatrix, n);
+            
             if(!network.isConnected())
             {
                 //System.out.println("no overflow");
@@ -88,21 +98,25 @@ public class Main {
                 continue;
            }
 
-// Create MA ordering
-            
-            //ArrayList<Integer> MA = new ArrayList<>();
-            //createMAOrder(MA, network.adjMatrix, allNodes);
+          
+            // initialize a new matrix to be used for computation purposes
+            int[][] adjMatrix = new int[n][n];
+            copyMatrix(adjMatrix, network.adjMatrix, n);
+            // initialize criticalEdgeCount to 0, will be modified in the Lambda function call
             criticalEdgeCount = 0;
-            int LG = Lambda(network.adjMatrix, allNodes, n);
+            // compute connectivity of the graph
+            int LG = Lambda(adjMatrix, allNodes, n);
+            // add the obtained statistics to the list for plotting
             LambdaG.add(LG);
+            
             criticalEdges.add(criticalEdgeCount);
-           // printMatrix(network.adjMatrix, n);
-           // System.out.println("MA Ordering"+MA);
+           
             
         }
-        System.out.println("Lambda Values:"+LambdaG);
-        System.out.println("Densities:"+densities);
-        System.out.println("Lowest Degrees:"+lowestDegrees);
+        System.out.println("Lambda Values\t:"+LambdaG);
+        System.out.println("Densities\t:"+densities);
+        System.out.println("Lowest Degrees\t:"+lowestDegrees);
+        System.out.println("Critical Edges\t:"+criticalEdges);
         printToFile(LambdaG, densities, lowestDegrees, criticalEdges);
     }
 
@@ -133,9 +147,12 @@ public class Main {
         MA.add(v1);
         for(int i = 0 ; i < allNodes.size() - 1 ; i++){
             int sumOfDegreeMA = 0; // we start of my summing up the edges to MA for each of remaining vertices
+            
             int[] degVectToMA = new int[allNodes.size()];
+            
             int max = 0;
             int maxind = 0;
+            
             for(int j = 0 ; j < allNodes.size() ; j++){
                 int jele = allNodes.get(j);
                 if(MA.contains(jele))
@@ -177,15 +194,17 @@ public class Main {
                 break;
             }
         }
+         int LambdaGxy = Lambda(adjMatrix, allNodes, n);
          
-        int LambdaGxy = Lambda(adjMatrix, allNodes, n);
-        if(LambdaXY<LambdaGxy){
-            criticalEdgeCount += edgeCriticality;
-            return LambdaXY;
-        }
-        else{
-            return LambdaGxy;
-        }
+         if(LambdaXY<LambdaGxy){
+             // this means removing x,y decreases the connectivity of the graph
+             criticalEdgeCount += edgeCriticality;
+             return LambdaXY;
+         }
+         else{
+             return LambdaGxy;
+         }
+      
         
        // return Math.min(LambdaXY, Lambda(adjMatrix, allNodes, n));
     
@@ -236,6 +255,15 @@ public class Main {
             fw.write(LambdaG.get(i)+","+densities.get(i)+","+lowestDegrees.get(i)+","+criticalEdges.get(i)+"\n");
         }
         fw.close();
+    }
+
+    // copy the contents of b:NxN into a:NxN
+    private static void copyMatrix(int[][] a, int[][] b, int n) {
+        for(int i = 0 ; i < n ; i++){
+            for(int j = 0 ; j < n ; j++){
+                a[i][j] = b[i][j];
+            }
+        }
     }
     
 }
