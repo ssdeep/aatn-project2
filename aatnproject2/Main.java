@@ -247,7 +247,7 @@ public class Main {
     }
 
     private static void printToFile(ArrayList<Integer> LambdaG, ArrayList<Double> densities, ArrayList<Integer> lowestDegrees, ArrayList<Integer> criticalEdges) throws FileNotFoundException, IOException {
-       FileWriter fw = new FileWriter("output.csv");
+       FileWriter fw = new FileWriter(".\\/data\\/output.csv");
        fw.write("LambdaG,densities,lowestDegree,criticalEdges\n");
                
         
